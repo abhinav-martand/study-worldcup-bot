@@ -1,10 +1,9 @@
-        import os
+import os
 import telebot
 
 TOKEN = "8931443042:AAGZkYIwKSLkOhBtc_uPDVw4YRstm1opbAg"
 bot = telebot.TeleBot(TOKEN)
 
-# Updated Data State
 data = {
     "Spain": {
         "flag": "🇪🇸",
@@ -72,7 +71,6 @@ def generate_report():
     for country, info in data.items():
         text += f"{info['flag']} {country}\n"
         for player, score in info["players"].items():
-            # Format float values nicely (remove .0 if whole number)
             score_val = int(score) if score.is_integer() else score
             note = f" {info['extra_notes'][player]}" if player in info['extra_notes'] else ""
             text += f"- {player} — {score_val}{note}\n"

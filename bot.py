@@ -1,20 +1,21 @@
-import os
+        import os
 import telebot
 
 TOKEN = "8931443042:AAGZkYIwKSLkOhBtc_uPDVw4YRstm1opbAg"
 bot = telebot.TeleBot(TOKEN)
 
+# Updated Data State
 data = {
     "Spain": {
         "flag": "🇪🇸",
         "emoji": "⚽️",
         "players": {
-            "Raiii": 48,
-            "Srishti": 74,
-            "ELON MUSK": 29,
-            "Priyanshu": 21,
-            "Zoe": 21,
-            "Anwesha": 20,
+            "Raiii": 48.0,
+            "Srishti": 74.0,
+            "ELON MUSK": 37.0,
+            "Priyanshu": 21.0,
+            "Zoe": 21.0,
+            "Anwesha": 20.0,
         },
         "extra_notes": {"Srishti": "(+9)"},
     },
@@ -22,12 +23,12 @@ data = {
         "flag": "🇵🇹",
         "emoji": "⚽️",
         "players": {
-            "Positron": 77,
-            "Ishant": 51,
-            "Saumya": 23,
-            "Madhav": 23,
-            "Tennessine": 18,
-            "Yuvraj": 11,
+            "Positron": 77.0,
+            "Ishant": 51.0,
+            "Saumya": 23.0,
+            "Madhav": 23.0,
+            "Tennessine": 18.0,
+            "Yuvraj": 11.0,
         },
         "extra_notes": {"Positron": "(+16)"},
     },
@@ -36,11 +37,11 @@ data = {
         "emoji": "⚽️",
         "players": {
             "Xeelzyx": 44.5,
-            "Phoenix": 31,
-            "Hrishabh": 28,
-            "Kanishk": 26,
-            "Hanjue": 21,
-            "Parth": 16,
+            "Phoenix": 40.0,
+            "Hrishabh": 28.0,
+            "Kanishk": 26.0,
+            "Hanjue": 28.0,
+            "Parth": 16.0,
         },
         "extra_notes": {},
     },
@@ -48,12 +49,12 @@ data = {
         "flag": "🇦🇷",
         "emoji": "⚽️",
         "players": {
-            "Sarthak": 53,
-            "Raunak": 39,
-            "James": 23,
-            "A": 17,
-            "Iota": 21,
-            "Samosapav": 15,
+            "Sarthak": 53.0,
+            "Raunak": 39.0,
+            "James": 23.0,
+            "A": 17.0,
+            "Iota": 28.0,
+            "Samosapav": 15.0,
         },
         "extra_notes": {"Sarthak": "(was 31, +22)"},
     },
@@ -71,13 +72,18 @@ def generate_report():
     for country, info in data.items():
         text += f"{info['flag']} {country}\n"
         for player, score in info["players"].items():
+            # Format float values nicely (remove .0 if whole number)
+            score_val = int(score) if score.is_integer() else score
             note = f" {info['extra_notes'][player]}" if player in info['extra_notes'] else ""
-            text += f"- {player} — {score}{note}\n"
-        text += f"\nTeam Goals: {team_totals[country]} ⚽️\n\n━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            text += f"- {player} — {score_val}{note}\n"
+        
+        team_tot_val = int(team_totals[country]) if team_totals[country].is_integer() else team_totals[country]
+        text += f"\nTeam Goals: {team_tot_val} ⚽️\n\n━━━━━━━━━━━━━━━━━━━━━━━\n\n"
 
     text += "🌍 TEAM STANDINGS\n\n"
     for country, total in sorted_teams:
-        text += f"- {country} — {total} ⚽️\n"
+        tot_val = int(total) if total.is_integer() else total
+        text += f"- {country} — {tot_val} ⚽️\n"
     text += "\n━━━━━━━━━━━━━━━━━━━━━━━\n\n"
 
     all_players = []
@@ -90,12 +96,14 @@ def generate_report():
 
     text += "👑 GOLDEN BOOT\n\n"
     for player, score in top_players:
-        text += f"- {player} — {score}\n"
+        sc_val = int(score) if score.is_integer() else score
+        text += f"- {player} — {sc_val}\n"
 
     return text
 
 @bot.message_handler(commands=['add'])
 def add_hours(message):
+    thread_id = getattr(message, 'message_thread_id', None)
     try:
         parts = message.text.split(maxsplit=1)[1]
         *name_parts, hours_str = parts.rsplit(maxsplit=1)
@@ -113,15 +121,15 @@ def add_hours(message):
                 break
 
         if found:
-            bot.send_message(message.chat.id, generate_report())
+            bot.send_message(message.chat.id, generate_report(), message_thread_id=thread_id)
         else:
-            bot.send_message(message.chat.id, f"❌ Player '{player_name}' not found.")
+            bot.send_message(message.chat.id, f"❌ Player '{player_name}' not found.", message_thread_id=thread_id)
     except Exception as e:
-        bot.send_message(message.chat.id, "⚠️ Usage format error. Use like: `/add ELON MUSK 8`", parse_mode="Markdown")
+        bot.send_message(message.chat.id, "⚠️ Usage format error. Use like: `/add ELON MUSK 8`", parse_mode="Markdown", message_thread_id=thread_id)
 
 @bot.message_handler(commands=['list', 'start'])
 def send_list(message):
-    bot.send_message(message.chat.id, generate_report())
+    thread_id = getattr(message, 'message_thread_id', None)
+    bot.send_message(message.chat.id, generate_report(), message_thread_id=thread_id)
 
 bot.infinity_polling()
-

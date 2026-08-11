@@ -5,6 +5,54 @@ TOKEN = "8931443042:AAGZkYIwKSLkOhBtc_uPDVw4YRstm1opbAg"
 bot = telebot.TeleBot(TOKEN)
 
 data = {
+    "Portugal": {
+        "flag": "🇵🇹",
+        "emoji": "⚽️",
+        "players": {
+            "Ishant": 0.0,
+            "Iota": 0.0,
+            "Xeelzyx": 0.0,
+            "Madhav": 0.0,
+            "Ananjan": 0.0,
+        },
+        "extra_notes": {"Ishant": "(Captain 🇨)"},
+    },
+    "France": {
+        "flag": "🇫🇷",
+        "emoji": "⚽️",
+        "players": {
+            "Positron": 0.0,
+            "Hrishabh": 0.0,
+            "Phoenix": 0.0,
+            "Parth": 0.0,
+            "Khasim": 0.0,
+        },
+        "extra_notes": {"Positron": "(Captain 🇨)"},
+    },
+    "Argentina": {
+        "flag": "🇦🇷",
+        "emoji": "⚽️",
+        "players": {
+            "Raunak": 0.0,
+            "Samosapav": 0.0,
+            "Saumya": 0.0,
+            "Hanjue": 0.0,
+            "Yuvraj": 0.0,
+        },
+        "extra_notes": {"Raunak": "(Captain 🇨)"},
+    },
+    "England": {
+        "flag": "🏴",
+        "emoji": "⚽️",
+        "players": {
+            "Sarthak": 0.0,
+            "James": 0.0,
+            "Tennessine": 0.0,
+            "Kanishk": 0.0,
+            "A": 0.0,
+        },
+        "extra_notes": {"Sarthak": "(Captain 🇨)"},
+    },
     "Spain": {
         "flag": "🇪🇸",
         "emoji": "⚽️",
@@ -12,48 +60,8 @@ data = {
             "Raiii": 0.0,
             "Srishti": 0.0,
             "ELON MUSK": 0.0,
-            "Priyanshu": 0.0,
             "Zoe": 0.0,
             "Anwesha": 0.0,
-        },
-        "extra_notes": {},
-    },
-    "Portugal": {
-        "flag": "🇵🇹",
-        "emoji": "⚽️",
-        "players": {
-            "Positron": 0.0,
-            "Ishant": 0.0,
-            "Saumya": 0.0,
-            "Madhav": 0.0,
-            "Tennessine": 0.0,
-            "Yuvraj": 0.0,
-        },
-        "extra_notes": {},
-    },
-    "England": {
-        "flag": "🏴",
-        "emoji": "⚽️",
-        "players": {
-            "Xeelzyx": 0.0,
-            "Phoenix": 0.0,
-            "Hrishabh": 0.0,
-            "Kanishk": 0.0,
-            "Hanjue": 0.0,
-            "Parth": 0.0,
-        },
-        "extra_notes": {},
-    },
-    "Argentina": {
-        "flag": "🇦🇷",
-        "emoji": "⚽️",
-        "players": {
-            "Sarthak": 0.0,
-            "Raunak": 0.0,
-            "James": 0.0,
-            "A": 0.0,
-            "Iota": 0.0,
-            "Samosapav": 0.0,
         },
         "extra_notes": {},
     },
@@ -72,8 +80,12 @@ def generate_report():
         text += f"{info['flag']} {country}\n"
         for player, score in info["players"].items():
             score_val = int(score) if score.is_integer() else score
-            note = f" {info['extra_notes'][player]}" if player in info['extra_notes'] else ""
-            text += f"- {player} — {score_val}{note}\n"
+            # Check for captain label or extra notes
+            note_str = ""
+            if player in info["extra_notes"]:
+                note_str = f" {info['extra_notes'][player]}"
+            
+            text += f"- {player} — {score_val}{note_str}\n"
         
         team_tot_val = int(team_totals[country]) if team_totals[country].is_integer() else team_totals[country]
         text += f"\nTeam Goals: {team_tot_val} ⚽️\n\n━━━━━━━━━━━━━━━━━━━━━━━\n\n"
@@ -264,7 +276,6 @@ def reset_scores(message):
         for country, info in data.items():
             for p_name in info["players"]:
                 info["players"][p_name] = 0.0
-            info["extra_notes"].clear()
 
         bot.send_message(message.chat.id, "🔄 Season 3 scores reset to 0!\n\n" + generate_report(), message_thread_id=thread_id)
     except Exception as e:
@@ -276,3 +287,4 @@ def send_list(message):
     bot.send_message(message.chat.id, generate_report(), message_thread_id=thread_id)
 
 bot.infinity_polling()
+    

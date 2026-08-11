@@ -9,38 +9,38 @@ data = {
         "flag": "🇪🇸",
         "emoji": "⚽️",
         "players": {
-            "Raiii": 48.0,
-            "Srishti": 74.0,
-            "ELON MUSK": 37.0,
-            "Priyanshu": 21.0,
-            "Zoe": 21.0,
-            "Anwesha": 20.0,
+            "Raiii": 0.0,
+            "Srishti": 0.0,
+            "ELON MUSK": 0.0,
+            "Priyanshu": 0.0,
+            "Zoe": 0.0,
+            "Anwesha": 0.0,
         },
-        "extra_notes": {"Srishti": "(+9)"},
+        "extra_notes": {},
     },
     "Portugal": {
         "flag": "🇵🇹",
         "emoji": "⚽️",
         "players": {
-            "Positron": 77.0,
-            "Ishant": 51.0,
-            "Saumya": 23.0,
-            "Madhav": 23.0,
-            "Tennessine": 18.0,
-            "Yuvraj": 11.0,
+            "Positron": 0.0,
+            "Ishant": 0.0,
+            "Saumya": 0.0,
+            "Madhav": 0.0,
+            "Tennessine": 0.0,
+            "Yuvraj": 0.0,
         },
-        "extra_notes": {"Positron": "(+16)"},
+        "extra_notes": {},
     },
     "England": {
         "flag": "🏴",
         "emoji": "⚽️",
         "players": {
-            "Xeelzyx": 44.5,
-            "Phoenix": 40.0,
-            "Hrishabh": 28.0,
-            "Kanishk": 26.0,
-            "Hanjue": 28.0,
-            "Parth": 16.0,
+            "Xeelzyx": 0.0,
+            "Phoenix": 0.0,
+            "Hrishabh": 0.0,
+            "Kanishk": 0.0,
+            "Hanjue": 0.0,
+            "Parth": 0.0,
         },
         "extra_notes": {},
     },
@@ -48,14 +48,14 @@ data = {
         "flag": "🇦🇷",
         "emoji": "⚽️",
         "players": {
-            "Sarthak": 53.0,
-            "Raunak": 39.0,
-            "James": 23.0,
-            "A": 17.0,
-            "Iota": 28.0,
-            "Samosapav": 15.0,
+            "Sarthak": 0.0,
+            "Raunak": 0.0,
+            "James": 0.0,
+            "A": 0.0,
+            "Iota": 0.0,
+            "Samosapav": 0.0,
         },
-        "extra_notes": {"Sarthak": "(was 31, +22)"},
+        "extra_notes": {},
     },
 }
 
@@ -66,7 +66,7 @@ def generate_report():
 
     sorted_teams = sorted(team_totals.items(), key=lambda x: x[1], reverse=True)
 
-    text = "🏆 STUDY WORLD CUP — S2\n\n━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+    text = "🏆 STUDY WORLD CUP — S3\n\n━━━━━━━━━━━━━━━━━━━━━━━\n\n"
 
     for country, info in data.items():
         text += f"{info['flag']} {country}\n"
@@ -266,7 +266,7 @@ def reset_scores(message):
                 info["players"][p_name] = 0.0
             info["extra_notes"].clear()
 
-        bot.send_message(message.chat.id, "🔄 All player scores have been reset to 0!\n\n" + generate_report(), message_thread_id=thread_id)
+        bot.send_message(message.chat.id, "🔄 Season 3 scores reset to 0!\n\n" + generate_report(), message_thread_id=thread_id)
     except Exception as e:
         bot.send_message(message.chat.id, "⚠️ Error resetting scores.", message_thread_id=thread_id)
 
@@ -276,4 +276,3 @@ def send_list(message):
     bot.send_message(message.chat.id, generate_report(), message_thread_id=thread_id)
 
 bot.infinity_polling()
-        

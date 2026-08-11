@@ -63,7 +63,7 @@ data = {
             "Zoe": 0.0,
             "Anwesha": 0.0,
         },
-        "extra_notes": {},
+        "extra_notes": {"Zoe": "(Captain 👑)"},
     },
 }
 
@@ -80,7 +80,6 @@ def generate_report():
         text += f"{info['flag']} {country}\n"
         for player, score in info["players"].items():
             score_val = int(score) if score.is_integer() else score
-            # Check for captain label or extra notes
             note_str = ""
             if player in info["extra_notes"]:
                 note_str = f" {info['extra_notes'][player]}"
@@ -287,4 +286,4 @@ def send_list(message):
     bot.send_message(message.chat.id, generate_report(), message_thread_id=thread_id)
 
 bot.infinity_polling()
-    
+            

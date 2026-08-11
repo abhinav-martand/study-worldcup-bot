@@ -125,9 +125,155 @@ def add_hours(message):
     except Exception as e:
         bot.send_message(message.chat.id, "⚠️ Usage format error. Use like: `/add ELON MUSK 8`", parse_mode="Markdown", message_thread_id=thread_id)
 
+@bot.message_handler(commands=['addplayer'])
+def add_player(message):
+    thread_id = getattr(message, 'message_thread_id', None)
+    try:
+        parts = message.text.split(maxsplit=1)[1]
+        *name_parts, target_country = parts.rsplit(maxsplit=1)
+        player_name = " ".join(name_parts).strip()
+
+        matched_country = None
+        for country in data.keys():
+            if country.lower() == target_country.lower():
+                matched_country = country
+                break
+
+        if not matched_country:
+            bot.send_message(message.chat.id, f"❌ Country '{target_country}' not found.", message_thread_id=thread_id)
+            return
+
+        exists = False
+        for country, info in data.items():
+            for p_name in info["players"]:
+                if p_name.lower() == player_name.lower():
+                    exists = True
+                    break
+            if exists:
+                break
+
+        if exists:
+            bot.send_message(message.chat.id, f"⚠️ Player '{player_name}' already exists! Use /shift to move them.", message_thread_id=thread_id)
+            return
+
+        data[matched_country]["players"][player_name] = 0.0
+        bot.send_message(message.chat.id, generate_report(), message_thread_id=thread_id)
+    except Exception as e:
+        bot.send_message(message.chat.id, "⚠️ Usage format error. Use like: `/addplayer John Spain`", parse_mode="Markdown", message_thread_id=thread_id)
+
+@bot.message_handler(commands=['subtract'])
+def subtract_hours(message):
+    thread_id = getattr(message, 'message_thread_id', None)
+    try:
+        parts = message.text.split(maxsplit=1)[1]
+        *name_parts, hours_str = parts.rsplit(maxsplit=1)
+        player_name = " ".join(name_parts).strip()
+        hours_to_sub = float(hours_str)
+
+        found = False
+        for country, info in data.items():
+            for p_name in info["players"]:
+                if p_name.lower() == player_name.lower():
+                    info["players"][p_name] -= hours_to_sub
+                    found = True
+                    break
+            if found:
+                break
+
+        if found:
+            bot.send_message(message.chat.id, generate_report(), message_thread_id=thread_id)
+        else:
+            bot.send_message(message.chat.id, f"❌ Player '{player_name}' not found.", message_thread_id=thread_id)
+    except Exception as e:
+        bot.send_message(message.chat.id, "⚠️ Usage format error. Use like: `/subtract ELON MUSK 5`", parse_mode="Markdown", message_thread_id=thread_id)
+
+@bot.message_handler(commands=['shift'])
+def shift_player(message):
+    thread_id = getattr(message, 'message_thread_id', None)
+    try:
+        parts = message.text.split(maxsplit=1)[1]
+        *name_parts, target_country = parts.rsplit(maxsplit=1)
+        player_name = " ".join(name_parts).strip()
+
+        matched_country = None
+        for country in data.keys():
+            if country.lower() == target_country.lower():
+                matched_country = country
+                break
+
+        if not matched_country:
+            bot.send_message(message.chat.id, f"❌ Country '{target_country}' not found.", message_thread_id=thread_id)
+            return
+
+        found_player = None
+        player_score = 0
+        player_note = None
+
+        for country, info in data.items():
+            for p_name in list(info["players"].keys()):
+                if p_name.lower() == player_name.lower():
+                    found_player = p_name
+                    player_score = info["players"].pop(p_name)
+                    if p_name in info["extra_notes"]:
+                        player_note = info["extra_notes"].pop(p_name)
+                    break
+            if found_player:
+                break
+
+        if not found_player:
+            bot.send_message(message.chat.id, f"❌ Player '{player_name}' not found anywhere.", message_thread_id=thread_id)
+            return
+
+        data[matched_country]["players"][found_player] = player_score
+        if player_note:
+            data[matched_country]["extra_notes"][found_player] = player_note
+
+        bot.send_message(message.chat.id, generate_report(), message_thread_id=thread_id)
+    except Exception as e:
+        bot.send_message(message.chat.id, "⚠️ Usage format error. Use like: `/shift ELON MUSK Argentina`", parse_mode="Markdown", message_thread_id=thread_id)
+
+@bot.message_handler(commands=['remove'])
+def remove_player(message):
+    thread_id = getattr(message, 'message_thread_id', None)
+    try:
+        player_name = message.text.split(maxsplit=1)[1].strip()
+
+        found = False
+        for country, info in data.items():
+            for p_name in list(info["players"].keys()):
+                if p_name.lower() == player_name.lower():
+                    info["players"].pop(p_name)
+                    if p_name in info["extra_notes"]:
+                        info["extra_notes"].pop(p_name)
+                    found = True
+                    break
+            if found:
+                break
+
+        if found:
+            bot.send_message(message.chat.id, generate_report(), message_thread_id=thread_id)
+        else:
+            bot.send_message(message.chat.id, f"❌ Player '{player_name}' not found.", message_thread_id=thread_id)
+    except Exception as e:
+        bot.send_message(message.chat.id, "⚠️ Usage format error. Use like: `/remove ELON MUSK`", parse_mode="Markdown", message_thread_id=thread_id)
+
+@bot.message_handler(commands=['reset'])
+def reset_scores(message):
+    thread_id = getattr(message, 'message_thread_id', None)
+    try:
+        for country, info in data.items():
+            for p_name in info["players"]:
+                info["players"][p_name] = 0.0
+            info["extra_notes"].clear()
+
+        bot.send_message(message.chat.id, "🔄 All player scores have been reset to 0!\n\n" + generate_report(), message_thread_id=thread_id)
+    except Exception as e:
+        bot.send_message(message.chat.id, "⚠️ Error resetting scores.", message_thread_id=thread_id)
+
 @bot.message_handler(commands=['list', 'start'])
 def send_list(message):
     thread_id = getattr(message, 'message_thread_id', None)
     bot.send_message(message.chat.id, generate_report(), message_thread_id=thread_id)
 
 bot.infinity_polling()
+        
